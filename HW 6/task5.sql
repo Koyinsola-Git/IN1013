@@ -1,53 +1,46 @@
-
+       
 -- 1
-SELECT first_name FROM restBill
-INNER JOIN restStaff
-ON restStaff.staff_no = restBill.waiter_no
-WHERE cust_name = "Tanya Singh";
+SELECT first_name,surname,bill_date,count(*) AS bills_taken
+FROM restStaff
+INNER JOIN restBill
+ON waiter_no = staff_no
+GROUP BY staff_no,bill_date
+HAVING COUNT(*)>=2;
 
 -- 2
-SELECT room_date FROM restRoom_management
-INNER JOIN restStaff
-ON restStaff.staff_no = restRoom_management.headwaiter
-AND restStaff.first_name = "Charles"
-WHERE room_date BETWEEN 160200 AND 160231
-AND room_name="Green";
+SELECT room_name,COUNT(*) AS tables
+FROM restRest_table 
+WHERE no_of_seats>6
+GROUP BY room_name;
 
 -- 3
-SELECT T1.first_name,T1.surname 
-FROM restStaff T1
-INNER JOIN restStaff T2
-INNER JOIN restStaff T3
-ON T3.first_name = "Zoe" AND T3.surname = "Ball" 
-AND T1.headwaiter = T2.staff_no AND T3.headwaiter = T2.staff_no; 
+SELECT room_name,SUM(bills.bill_total) AS total_bills
+FROM restRest_table tables
+INNER JOIN restBill bills
+ON bills.table_no = tables.table_no
+GROUP BY room_name;
 
 -- 4
-SELECT cust_name,bill_total,first_name
-FROM restBill
-INNER JOIN restStaff
-ON staff_no = waiter_no
-ORDER BY bill_total;
-
+SELECT heads.first_name,heads.surname,SUM(bill_total) AS total_bills_taken
+FROM restStaff heads
+INNER JOIN restStaff staff
+INNER JOIN restBill
+ON staff.staff_no = waiter_no 
+AND staff.headwaiter = heads.staff_no
+GROUP BY heads.staff_no
+ORDER BY total_bills_taken;
 
 -- 5
-SELECT S1.first_name,S1.surname 
-FROM restStaff S1
-INNER JOIN restStaff S2
-INNER JOIN restBill Bills
-ON S1.headwaiter = S2.headwaiter
-AND Bills.waiter_no = S2.staff_no
-WHERE Bills.bill_no = 0014 OR Bills.bill_no = 0017;
+SELECT cust_name
+FROM restBill
+GROUP BY cust_name
+HAVING AVG(bill_total)>=400;
 
-
+   
 -- 6
-SELECT S1.first_name,S1.surname
-FROM restStaff S1
-INNER JOIN restStaff S2
-INNER JOIN restBill bills
-INNER JOIN restRest_table tables
-ON bills.waiter_no = S2.staff_no 
-AND S1.headwaiter = S2.headwaiter
-AND tables.table_no = bills.table_no
-WHERE bills.bill_date = 160312
-AND tables.room_name = "Blue";
-
+SELECT first_name,surname,count(*) AS bills_taken
+FROM restStaff
+INNER JOIN restBill
+ON waiter_no = staff_no
+GROUP BY staff_no,bill_date
+HAVING COUNT(*)>=3;
